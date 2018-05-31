@@ -1,0 +1,243 @@
+﻿CREATE TABLE pessoa (
+  id INTEGER   NOT NULL ,
+  nome VARCHAR(35)   NOT NULL ,
+  documento VARCHAR(14)   NOT NULL   ,
+PRIMARY KEY(id));
+
+
+
+
+CREATE TABLE uf (
+  id INTEGER   NOT NULL ,
+  nome VARCHAR(2)   NOT NULL   ,
+PRIMARY KEY(id));
+
+
+
+
+CREATE TABLE cidade (
+  id INTEGER   NOT NULL ,
+  uf_id INTEGER   NOT NULL ,
+  nome VARCHAR(35)   NOT NULL   ,
+PRIMARY KEY(id)  ,
+  FOREIGN KEY(uf_id)
+    REFERENCES uf(id));
+
+
+CREATE INDEX cidade_FKIndex1 ON cidade (uf_id);
+
+
+CREATE INDEX IFK_Rel_02 ON cidade (uf_id);
+
+
+CREATE TABLE recibo (
+  id INTEGER   NOT NULL ,
+  pessoa_id INTEGER   NOT NULL ,
+  valor INTEGER   NOT NULL ,
+  data_emissao DATE   NOT NULL   ,
+PRIMARY KEY(id)    ,
+  FOREIGN KEY(pessoa_id)
+    REFERENCES pessoa(id),
+  FOREIGN KEY(pessoa_id)
+    REFERENCES pessoa(id));
+
+
+CREATE INDEX recibo_FKIndex1 ON recibo (pessoa_id);
+CREATE INDEX recibo_FKIndex2 ON recibo (pessoa_id);
+
+
+CREATE INDEX IFK_Emitente ON recibo (pessoa_id);
+CREATE INDEX IFK_Prestador ON recibo (pessoa_id);
+
+
+CREATE TABLE endereco (
+  id INTEGER   NOT NULL ,
+  pessoa_id INTEGER   NOT NULL ,
+  cidade_id INTEGER   NOT NULL ,
+  tipoLogradouro VARCHAR(10)   NOT NULL ,
+  logradouro VARCHAR(50)   NOT NULL ,
+  numero VARCHAR(10)   NOT NULL ,
+  complemento VARCHAR(10)   NOT NULL ,
+  cep VARCHAR(8)   NOT NULL ,
+  tipo  INTEGER   NOT NULL   ,
+PRIMARY KEY(id)    ,
+  FOREIGN KEY(cidade_id)
+    REFERENCES cidade(id),
+  FOREIGN KEY(pessoa_id)
+    REFERENCES pessoa(id));
+
+
+CREATE INDEX endereco_FKIndex1 ON endereco (cidade_id);
+CREATE INDEX endereco_FKIndex2 ON endereco (pessoa_id);
+
+
+CREATE INDEX IFK_Rel_01 ON endereco (cidade_id);
+CREATE INDEX IFK_Rel_03 ON endereco (pessoa_id);
+
+
+
+
+1= Insert Tabela UF.
+
+insert into uf (id, nome) values ('1','SC');
+insert into uf (id, nome) values ('2','PR');
+insert into uf (id, nome) values ('3','SP');
+insert into uf (id, nome) values ('4','AC');
+insert into uf (id, nome) values ('5','AL');
+insert into uf (id, nome) values ('6','AP');
+insert into uf (id, nome) values ('7','AM');
+insert into uf (id, nome) values ('8','BA');
+insert into uf (id, nome) values ('9','CE');
+insert into uf (id, nome) values ('10','DF');
+insert into uf (id, nome) values ('11','ES');
+insert into uf (id, nome) values ('12','GO');
+insert into uf (id, nome) values ('13','MA');
+insert into uf (id, nome) values ('14','MT');
+insert into uf (id, nome) values ('15','MS');
+insert into uf (id, nome) values ('16','MG');
+insert into uf (id, nome) values ('17','PA');
+insert into uf (id, nome) values ('18','PB');
+insert into uf (id, nome) values ('19','PE');
+insert into uf (id, nome) values ('20','PI');
+insert into uf (id, nome) values ('21','RJ');
+insert into uf (id, nome) values ('22','RN');
+insert into uf (id, nome) values ('23','RS');
+insert into uf (id, nome) values ('24','RO');
+insert into uf (id, nome) values ('25','RR');
+insert into uf (id, nome) values ('26','SE');
+insert into uf (id, nome) values ('27','TO');
+
+
+
+2 = Inserir Cidades nas Siglas.
+
+select * from uf;
+--insert into cidade (id, uf_id, nome) values(1, 1, 'Chapeco');
+insert into cidade (id, uf_id, nome) values(2, 1, 'Blumenau');
+insert into cidade (id, uf_id, nome) values(3, 1, 'Joinville');
+
+insert into cidade (id, uf_id, nome) values(4, 2, 'Curitiba');
+insert into cidade (id, uf_id, nome) values(5, 2, 'Maringa');
+insert into cidade (id, uf_id, nome) values(6, 2,'Lunardeli');
+insert into cidade (id, uf_id, nome) values(7, 2,'Apucarana');
+insert into cidade (id, uf_id, nome) values(8, 2,'Santa fe');
+insert into cidade (id, uf_id, nome) values(9, 2,'Sao Miguel do Iguacu');
+insert into cidade (id, uf_id, nome) values(10, 2,'Arapongas');
+insert into cidade (id, uf_id, nome) values(11, 2,'Ponta Grosa');
+insert into cidade (id, uf_id, nome) values(12, 2,'Jandaia do Sul');
+
+insert into cidade (id, uf_id, nome) values(13, 3,'Ribeirao Preto');
+
+
+
+3 = Realiazar remoção dos estados sem cidades.
+
+delete from uf where nome not in ('PR', 'SC', 'SP');
+
+
+4 = Inserir novas cidades no estado de SP.
+
+insert into cidade (id, uf_id, nome) values(14, 3,'Santos');
+insert into cidade (id, uf_id, nome) values(15, 3,'Ourinhos');
+insert into cidade (id, uf_id, nome) values(16, 3,'Campinas');
+insert into cidade (id, uf_id, nome) values(17, 3,'Sao Paulo');
+
+
+
+5 = Realizando atualizaçãoes em algumas cidades.
+
+update cidade set nome = 'Lunardelli' where nome = 'Lunardeli';
+update cidade set nome = 'Jandaia' where nome = 'Jandaia do Sul';
+update cidade set nome = 'Cidade Cancao' where nome = 'Maringa';
+
+
+
+6 = Faça um select que retorne as cidades e seus estados.
+
+select * from cidade
+inner join uf on (cidade.uf_id = uf.id)
+order by uf.nome, cidade.nome;
+
+
+
+7 = Retorna quantas cidades cada estado possui.
+
+select 
+   uf.nome,
+   count(*) as QUANTIDADE 
+from cidade
+inner join uf on (cidade.uf_id = uf.id)
+group by uf.nome;
+
+
+
+8 = Insere 3 pessoas com endereço comercial e residencial do PR.
+
+insert into pessoa (id, nome, documento) values(1, 'Douglas Lopes','000.000.000-43');
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(1, 1, 5, 'Rua', 'São Cristovao', '327', '', '87050490', 1);
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(2, 1, 5, 'Rua', 'Cariovaldo Ferreira', '568', '', '87043620', 2);
+
+insert into pessoa (id, nome, documento) values(2, 'Andre Felipe','000.000.999-43');
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(3, 2, 4, 'Avenida', 'Brasil', '222', '', '85000470', 1);
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(4, 2, 4, 'Rua', 'Apucarana', '999', '', '87043999', 2);
+
+insert into pessoa (id, nome, documento) values(3, 'Brendow Vidotti','000.000.888-43');
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(5, 3, 10, 'Avenida', 'Tuiuti', '888', '', '87005555', 1);
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(6, 3, 10, 'Avenida', 'Colombo', '152', '', '87043000', 2);
+
+
+
+9 = Insere 2 pessoas com endereço comercial e residencial de SP.
+
+insert into pessoa (id, nome, documento) values(4, 'Jose Silva','000.777.888-43');
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(7, 4, 14, 'Praca', 'Rocha Pombo', '228', '', '87005555', 1);
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(8, 4, 14, 'Avenida', 'Guaiapo', '111', '', '87673000', 2);
+
+insert into pessoa (id, nome, documento) values(5, 'Maria Joao','000.550.888-43');
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(9, 5, 15, 'Avenida', 'Guedner', '333', '', '87033355', 1);
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(10, 5, 15, 'Avenida', 'Paranavai', '444', '', '44443000', 2);
+
+
+
+10 = Insere 2 pessoas  com endereço comercial em SC.
+
+insert into pessoa (id, nome, documento) values(6, 'Joao Qualque','111.550.888-43');
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(11, 6, 1, 'Avenida', 'das Torres', '333', '', '11133355', 1);
+
+insert into pessoa (id, nome, documento) values(7, 'Josefina','222.550.888-43');
+insert into endereco (id, pessoa_id, cidade_id, tipologradouro, logradouro, numero, complemento, cep, tipo) values(12, 7, 2, 'Avenida', 'Lobato', '333', '', '87032225', 1);
+
+
+
+11 = Select que retorna nome e endereço com cidade e estado das pessoas.
+
+select 
+   pessoa.nome,
+   endereco.tipologradouro,
+   endereco.logradouro,
+   endereco.numero,
+   endereco.cep,
+   endereco.tipo,
+   cidade.nome,
+   uf.nome
+from pessoa
+inner join endereco on (pessoa.id = endereco.pessoa_id)
+inner join cidade on (endereco.cidade_id = cidade.id)
+inner join uf on (uf.id = cidade.uf_id)
+order by pessoa.nome, uf.nome, cidade.nome;
+
+
+12 = Remove todas as pessoas que tem endereço em Ribeirão Preto.
+
+delete from endereco where cidade_id = 13;
+
+
+13 = Altera todos os ceps dos endereços.
+
+update endereco set cep = '00000000';
+
+
+
+
+
+
